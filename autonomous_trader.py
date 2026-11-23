@@ -686,6 +686,9 @@ class AutonomousRLEngine:
     def _daemon_loop(self):
         core_watchlist = [
             ("SUZLON.NS", 64.20, "INR", 0.05),
+            ("TATASTEEL.NS", 142.50, "INR", 0.05),
+            ("IOC.NS", 138.80, "INR", 0.05),
+            ("PNB.NS", 102.30, "INR", 0.05),
             ("IREDA.NS", 218.40, "INR", 0.05),
             ("CDSL.NS", 1745.00, "INR", 0.05),
             ("KAYNES.NS", 5820.00, "INR", 0.05),
@@ -854,7 +857,7 @@ class AutonomousRLEngine:
 
                             # 5K Portfolio execution hook
                             try:
-                                if sym in ["SUZLON.NS", "IREDA.NS", "CDSL.NS", "KAYNES.NS", "BSE.NS"]:
+                                if sym in ["SUZLON.NS", "TATASTEEL.NS", "IOC.NS", "PNB.NS", "IREDA.NS", "CDSL.NS"]:
                                     portfolio_5k.execute_trade(
                                         ticker=sym,
                                         side="BUY",
