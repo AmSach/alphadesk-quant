@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.db
+*.log
+deep_q_network.pth
+fast_quant.dll
+.env

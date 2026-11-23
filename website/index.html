@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlphaDesk Quant | C++ Accelerated Reinforcement Learning Workstation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #05070a;
+      --bg-surface: #0a0d14;
+      --bg-surface-elevated: #0f1420;
+      --bg-surface-hover: #141b2b;
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-medium: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.22);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --accent-emerald: #10b981;
+      --accent-emerald-dim: rgba(16, 185, 129, 0.12);
+      --accent-crimson: #f43f5e;
+      --accent-crimson-dim: rgba(244, 63, 94, 0.12);
+      --accent-amber: #f59e0b;
+      --accent-amber-dim: rgba(245, 158, 11, 0.12);
+      --accent-blue: #3b82f6;
+      --accent-blue-dim: rgba(59, 130, 246, 0.12);
+      --accent-cyan: #06b6d4;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, monospace;
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* FLOATING PILL NAVBAR */
+    .nav-island-container {
+      position: sticky;
+      top: 14px;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+    .nav-island {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 7px 18px;
+      border-radius: 9999px;
+      background: rgba(10, 13, 20, 0.85);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--border-medium);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.3s var(--ease-spring);
+    }
+    .nav-island:hover {
+      border-color: var(--border-strong);
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .ping-dot {
+      position: relative;
+      display: flex;
+      width: 8px;
+      height: 8px;
+    }
+    .ping-dot-wave {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      opacity: 0.75;
+      animation: pingWave 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    .ping-dot-core {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px var(--accent-emerald);
+    }
+    @keyframes pingWave {
+      75%, 100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .nav-separator {
+      width: 1px;
+      height: 16px;
+      background: var(--border-medium);
+    }
+
+    .market-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .market-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* SEARCH COMMAND DECK */
+    .deck-container {
+      max-width: 1320px;
+      margin: 24px auto 0 auto;
+      padding: 0 20px;
+    }
+
+    .command-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 14px;
+      padding: 8px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: all 0.2s var(--ease-spring);
+    }
+    .command-bar:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 1px var(--accent-blue), 0 12px 32px rgba(59, 130, 246, 0.15);
+    }
+
+    .command-prefix {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      letter-spacing: -0.01em;
+    }
+
+    .command-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+    .command-input::placeholder {
+      color: var(--text-tertiary);
+      font-weight: 400;
+    }
+
+    .btn-action-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      border-radius: 9px;
+      background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+      color: #0f172a;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+      transition: all 0.15s var(--ease-spring);
+    }
+    .btn-action-primary:hover {
+      filter: brightness(1.05);
+    }
+    .btn-action-primary:active {
+      transform: scale(0.97);
+    }
+
+    /* QUICK PRESETS STRIP */
+    .quick-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .quick-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    .pill-btn {
+      padding: 4px 11px;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s var(--ease-spring);
+    }
+    .pill-btn:hover {
+      color: #fff;
+      border-color: var(--border-strong);
+      background: var(--bg-surface-hover);
+    }
+    .pill-btn.active {
+      color: var(--accent-blue);
+      border-color: rgba(59, 130, 246, 0.4);
+      background: var(--accent-blue-dim);
+    }
+
+    /* HERO ASSET COCKPIT (BENTO MASTER) */
+    .cockpit-bento {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    @media (max-width: 1024px) {
+      .cockpit-bento { grid-template-columns: 1fr; }
+    }
+
+    .bento-card {
+      position: relative;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 18px;
+      padding: 22px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transition: all 0.25s var(--ease-spring);
+    }
+    .bento-card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .asset-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .asset-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .ticker-code {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+    .company-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .price-cluster {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .live-price-val {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .pct-tag {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+    .pct-up { background: var(--accent-emerald-dim); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .pct-down { background: var(--accent-crimson-dim); color: var(--accent-crimson); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    /* CORE EXECUTION BRACKET STRIP */
+    .execution-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    @media (max-width: 640px) {
+      .execution-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+    .bracket-node {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .bracket-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .bracket-val {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .bracket-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* RIGHT VERDICT BENTO */
+    .verdict-bento {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .verdict-top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+    .verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      margin-top: 14px;
+    }
+    .v-strong-buy { background: var(--accent-emerald-dim); color: var(--accent-emerald); border: 1.5px solid var(--accent-emerald); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); }
+    .v-buy { background: rgba(20, 184, 166, 0.15); color: #14b8a6; border: 1.5px solid #14b8a6; }
+    .v-hold { background: var(--accent-amber-dim); color: var(--accent-amber); border: 1.5px solid var(--accent-amber); }
+    .v-reduce { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1.5px solid #f97316; }
+    .v-sell { background: var(--accent-crimson-dim); color: var(--accent-crimson); border: 1.5px solid var(--accent-crimson); box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
+
+    .verdict-directive {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .verdict-adv-stat {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    /* WORKBENCH TABS DECK */
+    .tabs-deck {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 24px;
+      border-bottom: 1px solid var(--border-medium);
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .tab-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 9px 9px 0 0;
+      background: transparent;
+      border: 1px solid transparent;
+      border-bottom: 2px solid transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s var(--ease-spring);
+    }
+    .tab-trigger:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .tab-trigger.active {
+      color: #fff;
+      background: var(--bg-surface);
+      border-color: var(--border-medium);
+      border-bottom-color: var(--accent-blue);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* TAB CONTENT PANES */
+    .tab-viewport {
+      margin-top: 20px;
+      margin-bottom: 60px;
+    }
+    .pane-section {
+      display: none;
+    }
+    .pane-section.active {
+      display: block;
+      animation: fadeIn 0.25s var(--ease-spring);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CHART VIEW */
+    .chart-stage {
+      width: 100%;
+      height: 420px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    svg.vector-chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* CARD GRIDS */
+    .grid-duo {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .grid-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .grid-quad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .grid-duo, .grid-trio, .grid-quad { grid-template-columns: 1fr; }
+    }
+
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .kpi-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .kpi-val {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 6px;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* TABLES */
+    .tabular-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .audit-table th {
+      text-align: left;
+      padding: 11px 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-medium);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .audit-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .audit-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+    }
+
+    /* RL LEARNING PROGRESS BAR */
+    .rl-weight-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .rl-weight-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
+      border-radius: 999px;
+    }
+
+    /* NEWS FEED TILES */
+    .news-tile {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: all 0.2s var(--ease-spring);
+    }
+    .news-tile:hover {
+      border-color: var(--border-strong);
+    }
+    .news-tile-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+    .news-link {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      line-height: 1.4;
+    }
+    .news-link:hover {
+      color: var(--accent-blue);
+    }
+    .news-body {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* CONTROLS DECK */
+    .controls-deck {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    @media (max-width: 768px) {
+      .controls-deck { grid-template-columns: 1fr; }
+    }
+    .control-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .control-input {
+      width: 100%;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      margin-top: 6px;
+      outline: none;
+    }
+    .control-input:focus {
+      border-color: var(--accent-blue);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FLOATING PILL NAVBAR -->
+  <div class="nav-island-container">
+    <nav class="nav-island">
+      <div class="brand-mark">
+        <span class="ping-dot">
+          <span class="ping-dot-wave"></span>
+          <span class="ping-dot-core"></span>
+        </span>
+        <span>ALPHADESK QUANT</span>
+      </div>
+
+      <div class="nav-separator"></div>
+
+      <div class="market-telemetry">
+        <div class="market-badge">
+          <span>NSE / BSE: ACTIVE</span>
+        </div>
+        <div class="market-badge">
+          <span id="nav-clock">IST: --:--:--</span>
+        </div>
+        <div class="market-badge" style="color:var(--accent-emerald); font-weight:700;">
+          <span id="latency-stat">C++20: 3.2ms</span>
+        </div>
+      </div>
+
+      <div class="nav-separator"></div>
+
+      <div class="market-badge" style="color:var(--accent-cyan);">
+        <span>RL POLICY: ACTIVE</span>
+      </div>
+
+      <div class="nav-separator"></div>
+
+      <div class="market-badge" style="color:var(--accent-purple); font-weight:700;" id="nav-nn-badge">
+        <span>NEURAL NET (CUDA): <span id="nn-epoch-stat" style="color:#fff;">0</span> EPOCHS</span>
+      </div>
+
+      <div class="nav-separator"></div>
+
+      <div class="market-badge" style="color:var(--accent-amber); font-family:var(--font-mono); font-size:11px;" id="nav-tick-badge">
+        <span id="nav-tick-sym">SUZLON.NS</span>
+        <span id="nav-tick-px" style="font-weight:700; margin-left:4px;">₹64.20</span>
+        <span id="nav-tick-ms" style="color:var(--text-tertiary); margin-left:6px;">[16:00:00.000]</span>
+      </div>
+    </nav>
+  </div>
+
+  <!-- DECK CONTAINER -->
+  <div class="deck-container">
+
+    <!-- SEARCH COMMAND BAR -->
+    <div class="command-bar">
+      <span class="command-prefix">EXECUTE:></span>
+      <input type="text" id="sym-input" class="command-input" placeholder="Search any stock on BSE, NSE or US: e.g. SUZLON, IREDA, 532667, TCS, NVDA, PLTR..." value="SUZLON.NS" />
+      <button id="btn-run" class="btn-action-primary">
+        <span>COMPUTE</span>
+      </button>
+    </div>
+
+    <!-- QUICK PRESETS STRIP -->
+    <div class="quick-strip">
+      <span class="quick-title">FAST PRESETS:</span>
+      <button class="pill-btn active" onclick="loadSymbol('SUZLON.NS')">SUZLON</button>
+      <button class="pill-btn" onclick="loadSymbol('IREDA.NS')">IREDA</button>
+      <button class="pill-btn" onclick="loadSymbol('CDSL.NS')">CDSL</button>
+      <button class="pill-btn" onclick="loadSymbol('ANGELONE.NS')">ANGELONE</button>
+      <button class="pill-btn" onclick="loadSymbol('KAYNES.NS')">KAYNES</button>
+      <button class="pill-btn" onclick="loadSymbol('MAZDOCK.NS')">MAZDOCK</button>
+      <button class="pill-btn" onclick="loadSymbol('BSE.NS')">BSE LTD</button>
+      <button class="pill-btn" onclick="loadSymbol('532540')">TCS (BSE)</button>
+      <button class="pill-btn" onclick="loadSymbol('NVDA')">NVDA</button>
+      <button class="pill-btn" onclick="loadSymbol('PLTR')">PLTR</button>
+    </div>
+
+    <!-- HERO ASSET COCKPIT (BENTO MASTER) -->
+    <div class="cockpit-bento">
+
+      <!-- LEFT COCKPIT: IDENTIFIERS & EXECUTION BRACKETS -->
+      <div class="bento-card">
+        <div class="asset-header-flex">
+          <div class="asset-title-block">
+            <div style="display:flex; align-items:baseline; gap:10px;">
+              <span id="hero-sym" class="ticker-code">SUZLON.NS</span>
+              <span id="hero-tier-badge" class="market-badge" style="color:var(--accent-blue); border-color:rgba(59,130,246,0.3);">SMALL CAP</span>
+            </div>
+            <div id="hero-company" class="company-title">Suzlon Energy Limited</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="kpi-label">20-DAY ADV</div>
+            <div id="hero-adv-vol" style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:#fff; margin-top:2px;">82,122,875 shares</div>
+          </div>
+        </div>
+
+        <div class="price-cluster">
+          <span id="hero-last-px" class="live-price-val">₹36.96</span>
+          <span id="hero-pct-badge" class="pct-tag pct-down">-1.20%</span>
+          <span id="mc-prob-badge" style="font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); margin-left:8px;">P(Target 1st): 33.5% (10,000 MC Paths)</span>
+        </div>
+
+        <!-- EXECUTION BRACKET STRIP -->
+        <div class="execution-strip">
+          <div class="bracket-node">
+            <span class="bracket-title">ENTRY</span>
+            <span id="b-entry" class="bracket-val">₹36.96</span>
+            <span class="bracket-sub">Market Price</span>
+          </div>
+          <div class="bracket-node">
+            <span class="bracket-title">STOP LOSS</span>
+            <span id="b-stop" class="bracket-val" style="color:var(--accent-crimson);">₹34.51</span>
+            <span id="b-stop-pct" class="bracket-sub">-6.6% (2.0x ATR)</span>
+          </div>
+          <div class="bracket-node">
+            <span class="bracket-title">PROFIT TARGET</span>
+            <span id="b-target" class="bracket-val" style="color:var(--accent-emerald);">₹40.63</span>
+            <span id="b-target-pct" class="bracket-sub">+9.9% (3.0x ATR)</span>
+          </div>
+          <div class="bracket-node">
+            <span class="bracket-title">REWARD / RISK</span>
+            <span id="b-rr" class="bracket-val" style="color:var(--accent-blue);">1.50 : 1</span>
+            <span class="bracket-sub">Asymmetric Profile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COCKPIT: VERDICT & SIZING CAP -->
+      <div class="bento-card verdict-bento">
+        <div>
+          <div class="verdict-top-meta">
+            <span>DECISION ENGINE</span>
+            <span id="verdict-score-tag">SCORE: -1 / 5</span>
+          </div>
+          <div id="verdict-badge" class="verdict-badge v-reduce">REDUCE</div>
+          <div id="verdict-text" class="verdict-directive">
+            Distribution pressures detected across intermediate moving averages. Tighten existing stops.
+          </div>
+        </div>
+
+        <div class="verdict-adv-stat">
+          <span style="color:var(--text-tertiary);">LIQUIDITY CAP (2% ADV):</span>
+          <span id="verdict-liq-cap" style="color:var(--accent-emerald); font-weight:700;">1,642,457 shares max</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TABS DECK -->
+    <nav class="tabs-deck">
+      <button class="tab-trigger active" onclick="switchPane('pane-chart')">[CHART & SIZING]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-backtest')">[PARAMETRIC BACKTEST STUDIO]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-portfolio-5k')">[5K INR ACTIVE PORTFOLIO & CHARGES AUDIT]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-autonomous')">[24/7 AUTONOMOUS RL TRADER]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-rl')">[RL LEARNING & AUDIT]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-filings')">[EXCHANGE FILINGS & REG 30]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-vol')">[VOLATILITY & CIRCUITS]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-why')">[DERIVATION PROOF]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-insiders')">[INSIDER TRANSACTIONS]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-news')">[CATALYSTS & WIRE]</button>
+      <button class="tab-trigger" onclick="switchPane('pane-radar')">[WATCHLIST RADAR]</button>
+    </nav>
+
+    <!-- VIEWPORT PANES -->
+    <div class="tab-viewport">
+
+      <!-- PANE 1: CHART & SIZING -->
+      <div id="pane-chart" class="pane-section active">
+        <div class="chart-stage">
+          <svg id="stage-svg" class="vector-chart" viewBox="0 0 800 420" preserveAspectRatio="none"></svg>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+          <div style="display:flex; gap:16px;">
+            <span>50-DAY MOVING AVERAGE</span>
+            <span>200-DAY MOVING AVERAGE</span>
+            <span style="color:var(--accent-emerald);">ATR PROFIT TARGET</span>
+            <span style="color:var(--accent-crimson);">ATR STOP LOSS</span>
+          </div>
+          <div>90 TRADING SESSIONS</div>
+        </div>
+
+        <!-- RISK CONTROLS DECK -->
+        <div class="controls-deck">
+          <div class="control-box">
+            <span class="kpi-label">PORTFOLIO CAPITAL</span>
+            <input type="number" id="ctrl-cap" class="control-input" value="100000" onchange="recalcRisk()" />
+          </div>
+          <div class="control-box">
+            <span class="kpi-label">RISK PER TRADE (%)</span>
+            <input type="number" id="ctrl-risk" class="control-input" value="1.0" step="0.5" onchange="recalcRisk()" />
+          </div>
+          <div class="control-box">
+            <span class="kpi-label">CALCULATED POSITION ALLOCATION</span>
+            <div id="ctrl-pos-val" style="font-family:var(--font-mono); font-size:16px; font-weight:800; color:#fff; margin-top:8px;">
+              408 shares (₹15,079)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 2: REINFORCEMENT LEARNING & AUDIT -->
+      <div id="pane-rl" class="pane-section">
+        <div class="grid-quad" style="margin-bottom:16px;">
+          <div class="kpi-card">
+            <span class="kpi-label">RL POLICY WIN RATE</span>
+            <div id="rl-winrate" class="kpi-val" style="color:var(--accent-emerald);">53.8%</div>
+            <div class="kpi-sub">TARGET HITS VS STOP LOSS HITS</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">PROFIT FACTOR</span>
+            <div id="rl-profit-factor" class="kpi-val" style="color:var(--accent-cyan);">1.75</div>
+            <div class="kpi-sub">GROSS GAINS / GROSS LOSSES</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">CUMULATIVE REALIZED R</span>
+            <div id="rl-net-r" class="kpi-val" style="color:#fff;">+4.50 R</div>
+            <div class="kpi-sub">NET ASYMMETRIC EXPECTANCY</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">RECORDED COMPUTES</span>
+            <div id="rl-total-records" class="kpi-val" style="color:#fff;">18</div>
+            <div class="kpi-sub">IMMUTABLE SQLITE AUDIT LOG</div>
+          </div>
+        </div>
+
+        <!-- LEARNED POLICY WEIGHTS -->
+        <div class="bento-card" style="margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div>
+              <span class="kpi-label">ADAPTIVE REINFORCEMENT LEARNING WEIGHTS</span>
+              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                The model penalizes rules on failed predictions (-1.0R) and reinforces rules on target hits (+1.5R).
+              </div>
+            </div>
+            <button class="btn-action-primary" onclick="triggerRLCycle()">
+              <span>RUN RL RE-LEARNING CYCLE</span>
+            </button>
+          </div>
+
+          <div id="rl-weights-grid" class="grid-duo">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- RECORDED COMPUTES LEDGER -->
+        <div class="tabular-panel">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>TIMESTAMP</th>
+                <th>TICKER</th>
+                <th>VERDICT</th>
+                <th>ENTRY</th>
+                <th>STOP</th>
+                <th>TARGET</th>
+                <th>OUTCOME AUDIT</th>
+                <th style="text-align:right;">REALIZED R</th>
+              </tr>
+            </thead>
+            <tbody id="rl-ledger-rows">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANE: EXCHANGE FILINGS & REGULATION 30 -->
+      <div id="pane-filings" class="pane-section">
+        <div class="tabular-panel">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>SUBMISSION TIMESTAMP</th>
+                <th>REGULATORY CATEGORY</th>
+                <th>OFFICIAL DISCLOSURE HEADLINE / SUBJECT</th>
+                <th>EXCHANGE SOURCE</th>
+                <th style="text-align:right;">OFFICIAL FILING</th>
+              </tr>
+            </thead>
+            <tbody id="filings-table-rows">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANE 3: VOLATILITY & CIRCUITS -->
+      <div id="pane-vol" class="pane-section">
+        <div class="grid-quad">
+          <div class="kpi-card">
+            <span class="kpi-label">HV5 / HV30 SQUEEZE RATIO</span>
+            <div id="kpi-squeeze" class="kpi-val">0.69</div>
+            <div id="kpi-squeeze-sub" class="kpi-sub" style="color:var(--accent-emerald);">COILING SQUEEZE DETECTED</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">VOLUME MULTIPLIER (V/ADV)</span>
+            <div id="kpi-vol-surge" class="kpi-val">0.57x</div>
+            <div id="kpi-vol-surge-sub" class="kpi-sub">NORMAL LIQUIDITY</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">EST 20% UPPER CIRCUIT</span>
+            <div id="kpi-uc" class="kpi-val" style="color:var(--accent-emerald);">₹44.34</div>
+            <div id="kpi-uc-dist" class="kpi-sub">+20.0% headroom</div>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">EST 20% LOWER CIRCUIT</span>
+            <div id="kpi-lc" class="kpi-val" style="color:var(--accent-crimson);">₹29.56</div>
+            <div id="kpi-lc-dist" class="kpi-sub">-20.0% floor</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 4: DERIVATION PROOF -->
+      <div id="pane-why" class="pane-section">
+        <div class="tabular-panel">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>RULE ID</th>
+                <th>FILTER NAME</th>
+                <th>AUDITED CONDITION</th>
+                <th>POINTS</th>
+                <th>STATUS</th>
+                <th>MATHEMATICAL RATIONALE</th>
+              </tr>
+            </thead>
+            <tbody id="proof-rows">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANE 5: INSIDER TRANSACTIONS -->
+      <div id="pane-insiders" class="pane-section">
+        <div class="tabular-panel">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>DATE</th>
+                <th>INSIDER / ENTITY</th>
+                <th>OFFICER ROLE</th>
+                <th>TRANSACTION TYPE</th>
+                <th style="text-align:right;">SHARES</th>
+                <th style="text-align:right;">VALUE</th>
+              </tr>
+            </thead>
+            <tbody id="insider-table-rows">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANE 6: CATALYSTS & WIRE -->
+      <div id="pane-news" class="pane-section">
+        <div id="wire-container">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- PANE 7: WATCHLIST RADAR -->
+      <div id="pane-radar" class="pane-section">
+        <div class="tabular-panel">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>SYMBOL</th>
+                <th>NAME</th>
+                <th>EXCHANGE</th>
+                <th>SECTOR</th>
+                <th>MARKET CAP</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="radar-watchlist-rows">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANE 8: PARAMETRIC BACKTEST STUDIO -->
+      <div id="pane-backtest" class="pane-section">
+        <!-- Relentless Neural Network Telemetry Banner -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, rgba(188,140,255,0.08), rgba(59,130,246,0.05)); border:1px solid rgba(188,140,255,0.3); border-radius:6px; padding:10px 16px; margin-bottom:14px;">
+          <div style="display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="ping-dot"><span class="ping-dot-core" style="background:var(--accent-purple);"></span></span>
+              <span style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:#fff;">RELENTLESS NEURAL ENGINE (CUDA ACTIVE)</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              COMPLETED EPOCHS: <span id="nn-banner-epochs" style="color:var(--accent-cyan); font-weight:700;">--</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              LOSS: <span id="nn-banner-loss" style="color:var(--accent-emerald); font-weight:700;">--</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              GRAD NORM: <span id="nn-banner-grad" style="color:var(--accent-amber); font-weight:700;">--</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              REPLAY MEMORY: <span id="nn-banner-buf" style="color:var(--accent-blue); font-weight:700;">-- / 50,000</span>
+            </div>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:11px; color:var(--accent-purple); font-weight:700;">
+            PYTORCH 2.5.1 + CUDA 12.1
+          </div>
+        </div>
+
+        <!-- Backtest Controls -->
+        <div class="controls-deck" style="margin-bottom:16px;">
+          <div class="control-box">
+            <span class="kpi-label">BACKTEST TICKER</span>
+            <input type="text" id="bt-ticker-input" class="control-input" value="SUZLON.NS" style="text-transform:uppercase;" onchange="runInteractiveBacktest()" />
+          </div>
+          <div class="control-box">
+            <span class="kpi-label">STRATEGY</span>
+            <select id="bt-strategy-select" class="control-input" onchange="runInteractiveBacktest()">
+              <option value="rl_adaptive">RL Adaptive Q-Policy (ATR & Squeeze)</option>
+              <option value="buy_hold">Passive Buy & Hold Benchmark</option>
+              <option value="trend_50_200">50/200 DMA Trend Following Cross</option>
+            </select>
+          </div>
+          <div class="control-box">
+            <span class="kpi-label">HORIZON</span>
+            <select id="bt-period-select" class="control-input" onchange="runInteractiveBacktest()">
+              <option value="1y" selected>1 Year Walk-Forward</option>
+              <option value="2y">2 Years Vectorized</option>
+              <option value="5y">5 Years Macro Cycle</option>
+            </select>
+          </div>
+          <div class="control-box">
+            <span class="kpi-label">CAPITAL</span>
+            <input type="number" id="bt-cap-input" class="control-input" value="100000" onchange="runInteractiveBacktest()" />
+          </div>
+          <div class="control-box">
+            <span class="kpi-label">RISK / TRADE (%)</span>
+            <input type="number" id="bt-risk-input" class="control-input" value="1.0" step="0.5" onchange="runInteractiveBacktest()" />
+          </div>
+          <div class="control-box" style="display:flex; gap:8px; align-items:flex-end;">
+            <button class="btn-action-primary" style="height:36px; padding:0 16px;" onclick="runInteractiveBacktest()">
+              <span>EXECUTE BACKTEST</span>
+            </button>
+            <button class="btn-action-primary" style="height:36px; padding:0 14px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4);" onclick="preset5KBacktest()">
+              <span>5K INR PRESET</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Cards Grid -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap:10px; margin-bottom:16px;">
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">NET RETURN</span>
+            <div id="bt-net-ret" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-emerald); margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">SHARPE RATIO</span>
+            <div id="bt-sharpe" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-blue); margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">SORTINO RATIO</span>
+            <div id="bt-sortino" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-cyan); margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">MAX DRAWDOWN</span>
+            <div id="bt-max-dd" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-crimson); margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">WIN RATE</span>
+            <div id="bt-win-rate" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-emerald); margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">PROFIT FACTOR</span>
+            <div id="bt-profit-factor" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-amber); margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">TOTAL TRADES</span>
+            <div id="bt-total-trades" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:#fff; margin-top:4px;">--</div>
+          </div>
+          <div class="bento-card" style="padding:12px;">
+            <span class="kpi-label">TOTAL TAXES</span>
+            <div id="bt-charges" style="font-family:var(--font-mono); font-size:18px; font-weight:800; color:var(--accent-amber); margin-top:4px;">--</div>
+          </div>
+        </div>
+
+        <!-- Vector SVG Equity Curve Chart -->
+        <div class="chart-stage" style="height:320px; margin-bottom:16px;">
+          <svg id="bt-equity-svg" class="vector-chart" viewBox="0 0 800 320" preserveAspectRatio="none"></svg>
+        </div>
+
+        <!-- Trade Log Table -->
+        <div class="tabular-panel">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>ENTRY DATE</th>
+                <th>EXIT DATE</th>
+                <th>SIDE</th>
+                <th>ENTRY PX</th>
+                <th>EXIT PX</th>
+                <th>SHARES</th>
+                <th>REALIZED P&L</th>
+                <th>R-MULTIPLE</th>
+                <th>EXIT REASON</th>
+              </tr>
+            </thead>
+            <tbody id="bt-trade-log-rows">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANE 5K: 5K INR ACTIVE PORTFOLIO & CHARGES AUDIT -->
+      <div id="pane-portfolio-5k" class="pane-section">
+        <!-- Account Status & Header Banner -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, rgba(16,185,129,0.08), rgba(59,130,246,0.05)); border:1px solid rgba(16,185,129,0.3); border-radius:6px; padding:12px 18px; margin-bottom:16px;">
+          <div style="display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="ping-dot"><span class="ping-dot-core" style="background:var(--accent-emerald);"></span></span>
+              <span style="font-family:var(--font-mono); font-size:13px; font-weight:800; color:#fff;">5K INR LIVE AUTONOMOUS PORTFOLIO ENGINE</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              CAPITAL BASE: <span style="color:#fff; font-weight:700;">INR 5,000.00</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              RISK / TRADE: <span style="color:var(--accent-amber); font-weight:700;">INR 75.00 (1.5%)</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              TAX SCHEDULE: <span style="color:var(--accent-cyan); font-weight:700;">SEBI + STT + GST (18%) + STAMP DUTY</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="pill-btn active" onclick="execute5KSignalTrade()">EXECUTE HIGH-ALPHA SIGNAL</button>
+            <button class="pill-btn" onclick="loadPortfolio5K()">SYNC AUDIT</button>
+            <button class="pill-btn" onclick="resetPortfolio5K()" style="border-color:rgba(244,63,94,0.4); color:var(--accent-crimson);">RESET 5K</button>
+          </div>
+        </div>
+
+        <!-- 5K Portfolio KPIs Grid -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div class="bento-card" style="padding:14px;">
+            <span class="kpi-label">TOTAL EQUITY</span>
+            <div id="p5k-equity" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:var(--accent-emerald); margin-top:4px;">INR 5,000.00</div>
+            <div id="p5k-return-badge" style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-top:2px;">Net: +0.0%</div>
+          </div>
+          <div class="bento-card" style="padding:14px;">
+            <span class="kpi-label">AVAILABLE CASH</span>
+            <div id="p5k-cash" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:#fff; margin-top:4px;">INR 5,000.00</div>
+            <div id="p5k-margin-allocated" style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-top:2px;">Margin Used: INR 0.00</div>
+          </div>
+          <div class="bento-card" style="padding:14px;">
+            <span class="kpi-label">REALIZED NET P&L</span>
+            <div id="p5k-net-pnl" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:var(--accent-cyan); margin-top:4px;">INR 0.00</div>
+            <div id="p5k-gross-badge" style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-top:2px;">Gross: INR 0.00</div>
+          </div>
+          <div class="bento-card" style="padding:14px;">
+            <span class="kpi-label">TOTAL TAXES & CHARGES</span>
+            <div id="p5k-total-charges" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:var(--accent-amber); margin-top:4px;">INR 0.00</div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-top:2px;">Statutory Deductions</div>
+          </div>
+          <div class="bento-card" style="padding:14px;">
+            <span class="kpi-label">WIN RATE</span>
+            <div id="p5k-winrate" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:var(--accent-emerald); margin-top:4px;">0.0%</div>
+            <div id="p5k-trade-counts" style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-top:2px;">0W / 0L</div>
+          </div>
+          <div class="bento-card" style="padding:14px;">
+            <span class="kpi-label">TOTAL TRADES</span>
+            <div id="p5k-total-trades" style="font-family:var(--font-mono); font-size:20px; font-weight:800; color:#fff; margin-top:4px;">0</div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary); margin-top:2px;">Max 2 Concurrent</div>
+          </div>
+        </div>
+
+        <!-- Itemized Indian Broker & Statutory Tax Schedule -->
+        <div class="bento-card" style="padding:16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:#fff; letter-spacing:0.05em;">[ITEMIZED STATUTORY CHARGES LEDGER - SEBI & FINANCE ACT SCHEDULE]</span>
+            <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">Zero Synthetic Assumptions · Exact Rupee Deductions</span>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">BROKERAGE (0.03% / ₹20)</span>
+              <div id="tax-brokerage" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:#fff; margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">STT / CTT (0.025% / 0.1%)</span>
+              <div id="tax-stt" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--accent-amber); margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">EXCHANGE TXN (NSE 0.00297%)</span>
+              <div id="tax-exch" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:#fff; margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">SEBI CHARGES (₹10/CR)</span>
+              <div id="tax-sebi" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:#fff; margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">STAMP DUTY (0.003% / 0.015%)</span>
+              <div id="tax-stamp" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:#fff; margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">GST (18% ON SERVICES)</span>
+              <div id="tax-gst" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--accent-cyan); margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">DP CHARGES (₹15.93 CNC)</span>
+              <div id="tax-dp" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:#fff; margin-top:4px;">INR 0.00</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:4px; padding:10px;">
+              <span class="kpi-label">SLIPPAGE (0.04% BUFFER)</span>
+              <div id="tax-slip" style="font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--accent-crimson); margin-top:4px;">INR 0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Open Positions -->
+        <div style="margin-bottom:16px;">
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:#fff; margin-bottom:8px;">[ACTIVE OPEN 5K POSITIONS]</div>
+          <div class="tabular-panel">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>TICKER</th>
+                  <th>SIDE</th>
+                  <th>TYPE</th>
+                  <th>ENTRY PRICE</th>
+                  <th>CURRENT PRICE</th>
+                  <th>STOP LOSS</th>
+                  <th>TARGET</th>
+                  <th>SHARES</th>
+                  <th>ALLOCATED</th>
+                  <th>GROSS P&L</th>
+                  <th>EST CHARGES</th>
+                  <th>NET P&L</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="p5k-positions-rows">
+                <tr><td colspan="13" style="text-align:center; color:var(--text-tertiary); font-family:var(--font-mono); padding:16px;">Zero active open positions in 5K portfolio. Available cash ready for signal entry.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Closed Trade Execution Ledger -->
+        <div>
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:#fff; margin-bottom:8px;">[EXECUTED TRADE & STATUTORY TAX LEDGER]</div>
+          <div class="tabular-panel">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>EXIT TIME</th>
+                  <th>TICKER</th>
+                  <th>SIDE</th>
+                  <th>QTY</th>
+                  <th>ENTRY PX</th>
+                  <th>EXIT PX</th>
+                  <th>GROSS P&L</th>
+                  <th>TOTAL TAXES</th>
+                  <th>NET P&L</th>
+                  <th>R-MULT</th>
+                  <th>EXIT TRIGGER</th>
+                  <th>PORTFOLIO EQUITY</th>
+                </tr>
+              </thead>
+              <tbody id="p5k-ledger-rows">
+                <tr><td colspan="12" style="text-align:center; color:var(--text-tertiary); font-family:var(--font-mono); padding:16px;">Zero closed trades in ledger.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 9: 24/7 AUTONOMOUS RL TRADER -->
+      <div id="pane-autonomous" class="pane-section">
+        <!-- Telemetry Strip -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:6px; padding:12px 16px; margin-bottom:16px;">
+          <div style="display:flex; gap:20px; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="ping-dot"><span class="ping-dot-core" style="background:var(--accent-emerald);"></span></span>
+              <span style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:#fff;">24/7 AUTONOMOUS SURVEILLANCE: ACTIVE</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              REPLAY BUFFER: <span style="color:var(--accent-blue); font-weight:700;">25,000 TRANSITIONS</span>
+            </div>
+            <div style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">
+              LEARNING RATE: <span style="color:var(--accent-cyan); font-weight:700;">α = 0.08, γ = 0.95</span>
+            </div>
+          </div>
+          <button class="pill-btn" onclick="loadAutonomousDashboard()">REFRESH TELEMETRY</button>
+        </div>
+
+        <!-- Market Timing Radar Grid -->
+        <div style="margin-bottom:20px;">
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--accent-amber); margin-bottom:10px; letter-spacing:1px;">
+            [MARKET TIMING RADAR: REAL-TIME DECISION MATRIX]
+          </div>
+          <div class="tabular-panel">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>TICKER</th>
+                  <th>VERDICT</th>
+                  <th>CONFIDENCE</th>
+                  <th>LAST PRICE</th>
+                  <th>RECOMMENDED ENTRY</th>
+                  <th>STOP LOSS</th>
+                  <th>TARGET PRICE</th>
+                  <th>ACTION REASONING</th>
+                </tr>
+              </thead>
+              <tbody id="auto-radar-rows">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Active Simulated Paper Positions -->
+        <div style="margin-bottom:20px;">
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--accent-emerald); margin-bottom:10px; letter-spacing:1px;">
+            [ACTIVE SIMULATED PAPER POSITIONS]
+          </div>
+          <div class="tabular-panel">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>OPEN TIME</th>
+                  <th>TICKER</th>
+                  <th>SIDE</th>
+                  <th>ENTRY PRICE</th>
+                  <th>CURRENT PRICE</th>
+                  <th>STOP LOSS</th>
+                  <th>TARGET PRICE</th>
+                  <th>SHARES</th>
+                  <th>UNREALIZED P&L</th>
+                  <th>UNREALIZED R</th>
+                </tr>
+              </thead>
+              <tbody id="auto-open-positions-rows">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Closed Realized Trades Ledger -->
+        <div>
+          <div style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--accent-blue); margin-bottom:10px; letter-spacing:1px;">
+            [CLOSED TRADES & Q-LEARNING REWARD LEDGER]
+          </div>
+          <div class="tabular-panel">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>EXIT TIME</th>
+                  <th>TICKER</th>
+                  <th>SIDE</th>
+                  <th>ENTRY PRICE</th>
+                  <th>EXIT PRICE</th>
+                  <th>SHARES</th>
+                  <th>REALIZED R</th>
+                  <th>EXIT REASON</th>
+                </tr>
+              </thead>
+              <tbody id="auto-closed-positions-rows">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let activeTicker = "SUZLON.NS";
+    let activeDossier = null;
+
+    // Real-time clock
+    function updateClock() {
+      const now = new Date();
+      const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+      document.getElementById("nav-clock").innerText = "IST: " + ist.toUTCString().split(' ')[4];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Tab switcher
+    function switchPane(paneId) {
+      document.querySelectorAll(".pane-section").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".tab-trigger").forEach(t => t.classList.remove("active"));
+
+      const target = document.getElementById(paneId);
+      if (target) target.classList.add("active");
+
+      const triggers = document.querySelectorAll(".tab-trigger");
+      const mapping = {
+        'pane-chart': 0, 'pane-backtest': 1, 'pane-portfolio-5k': 2, 'pane-autonomous': 3, 'pane-rl': 4,
+        'pane-filings': 5, 'pane-vol': 6, 'pane-why': 7, 'pane-insiders': 8,
+        'pane-news': 9, 'pane-radar': 10
+      };
+      if (mapping[paneId] !== undefined && triggers[mapping[paneId]]) {
+        triggers[mapping[paneId]].classList.add("active");
+      }
+
+      if (paneId === 'pane-rl') {
+        loadRLStatus();
+      } else if (paneId === 'pane-backtest') {
+        runInteractiveBacktest();
+      } else if (paneId === 'pane-portfolio-5k') {
+        loadPortfolio5K();
+      } else if (paneId === 'pane-autonomous') {
+        loadAutonomousDashboard();
+      }
+    }
+
+    // Select symbol from fast presets
+    function loadSymbol(sym) {
+      document.getElementById("sym-input").value = sym;
+      document.querySelectorAll(".pill-btn").forEach(p => {
+        if (p.innerText === sym || p.getAttribute("onclick").includes(sym)) p.classList.add("active");
+        else p.classList.remove("active");
+      });
+      executeCompute(sym);
+    }
+
+    // Main fetch & compute call (C++ Accelerated)
+    async function executeCompute(sym) {
+      if (!sym) sym = document.getElementById("sym-input").value;
+      sym = sym.trim();
+      if (!sym) return;
+
+      activeTicker = sym;
+      const btn = document.getElementById("btn-run");
+      btn.innerText = "COMPUTING...";
+      btn.disabled = true;
+
+      const cap = document.getElementById("ctrl-cap") ? document.getElementById("ctrl-cap").value : 100000;
+      const risk = document.getElementById("ctrl-risk") ? document.getElementById("ctrl-risk").value : 1.0;
+
+      try {
+        const res = await fetch(`/api/dossier?ticker=${encodeURIComponent(sym)}&capital=${cap}&risk=${risk}`);
+        if (!res.ok) {
+          const err = await res.json();
+          alert("Error: " + (err.error || "Failed to load symbol data"));
+          btn.innerText = "COMPUTE";
+          btn.disabled = false;
+          return;
+        }
+        const data = await res.json();
+        activeDossier = data;
+        renderDossierToUI(data);
+      } catch (err) {
+        console.error("Compute error:", err);
+      } finally {
+        btn.innerText = "COMPUTE";
+        btn.disabled = false;
+      }
+    }
+
+    // Render Data into Cockpit & Tabs
+    function renderDossierToUI(d) {
+      const ccy = d.currency_symbol || "₹";
+
+      // Latency badge
+      if (d.execution_time_ms) {
+        document.getElementById("latency-stat").innerText = `C++20: ${d.execution_time_ms}ms`;
+      }
+
+      // Hero Identifiers
+      document.getElementById("hero-sym").innerText = d.symbol;
+      document.getElementById("hero-company").innerText = d.company_name || d.symbol;
+      document.getElementById("hero-tier-badge").innerText = d.cap_tier;
+      document.getElementById("hero-adv-vol").innerText = Number(d.adv20).toLocaleString() + " shares";
+
+      document.getElementById("hero-last-px").innerText = ccy + d.price.toFixed(2);
+      const pctBadge = document.getElementById("hero-pct-badge");
+      pctBadge.innerText = (d.chg_1d >= 0 ? "+" : "") + d.chg_1d.toFixed(2) + "%";
+      pctBadge.className = "pct-tag " + (d.chg_1d >= 0 ? "pct-up" : "pct-down");
+
+      if (d.p_win_mc) {
+        document.getElementById("mc-prob-badge").innerText = `P(Target 1st): ${d.p_win_mc}% (10,000 MC Paths)`;
+      }
+
+      // Brackets
+      document.getElementById("b-entry").innerText = ccy + d.entry.toFixed(2);
+      document.getElementById("b-stop").innerText = ccy + d.stop.toFixed(2);
+      document.getElementById("b-stop-pct").innerText = "-" + d.stop_pct.toFixed(1) + "% (2.0x ATR)";
+      document.getElementById("b-target").innerText = ccy + d.target.toFixed(2);
+      document.getElementById("b-target-pct").innerText = "+" + d.target_pct.toFixed(1) + "% (3.0x ATR)";
+      document.getElementById("b-rr").innerText = d.rr_ratio.toFixed(2) + " : 1";
+
+      // Verdict
+      const vBadge = document.getElementById("verdict-badge");
+      vBadge.innerText = d.verdict;
+      vBadge.className = "verdict-badge";
+      if (d.verdict === "STRONG BUY") vBadge.classList.add("v-strong-buy");
+      else if (d.verdict === "BUY") vBadge.classList.add("v-buy");
+      else if (d.verdict === "HOLD") vBadge.classList.add("v-hold");
+      else if (d.verdict === "REDUCE") vBadge.classList.add("v-reduce");
+      else vBadge.classList.add("v-sell");
+
+      document.getElementById("verdict-score-tag").innerText = "SCORE: " + (d.score > 0 ? "+" : "") + d.score + " / " + d.max_score;
+      document.getElementById("verdict-text").innerText = d.action_desc;
+      document.getElementById("verdict-liq-cap").innerText = Number(d.adv_cap_qty).toLocaleString() + " shares max";
+
+      // Risk Controls
+      if (document.getElementById("ctrl-pos-val")) {
+        document.getElementById("ctrl-pos-val").innerText = Number(d.exec_qty).toLocaleString() + " shares (" + ccy + Number(d.total_pos_value).toLocaleString() + ")";
+      }
+
+      // Volatility & Circuits
+      document.getElementById("kpi-squeeze").innerText = d.squeeze_ratio.toFixed(2);
+      const sqSub = document.getElementById("kpi-squeeze-sub");
+      sqSub.innerText = d.is_vol_squeeze ? "COILING SQUEEZE DETECTED" : "NORMAL VOLATILITY";
+      sqSub.style.color = d.is_vol_squeeze ? "var(--accent-emerald)" : "var(--text-secondary)";
+
+      document.getElementById("kpi-vol-surge").innerText = d.vol_surge.toFixed(2) + "x";
+      const surgeSub = document.getElementById("kpi-vol-surge-sub");
+      surgeSub.innerText = d.is_volume_surge ? "SURGE BREAKOUT" : "NORMAL LIQUIDITY";
+      surgeSub.style.color = d.is_volume_surge ? "var(--accent-cyan)" : "var(--text-secondary)";
+
+      document.getElementById("kpi-uc").innerText = ccy + d.upper_circuit.toFixed(2);
+      document.getElementById("kpi-uc-dist").innerText = "+" + d.dist_uc_pct.toFixed(1) + "% headroom";
+      document.getElementById("kpi-lc").innerText = ccy + d.lower_circuit.toFixed(2);
+      document.getElementById("kpi-lc-dist").innerText = "-" + d.dist_lc_pct.toFixed(1) + "% floor";
+
+      // Vector Chart
+      renderVectorChart(d.chart, d.entry, d.stop, d.target);
+
+      // Derivation Proof Rules Table
+      const proofBody = document.getElementById("proof-rows");
+      proofBody.innerHTML = (d.rules || []).map(r => `
+        <tr>
+          <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent-blue);">${r.id}</td>
+          <td style="font-weight:700;">${r.name}</td>
+          <td style="font-family:var(--font-mono);">${r.condition}</td>
+          <td style="font-family:var(--font-mono); font-weight:800; color:${r.points.startsWith('+') ? 'var(--accent-emerald)' : (r.points.startsWith('-') ? 'var(--accent-crimson)' : 'var(--text-tertiary)')};">${r.points}</td>
+          <td style="font-family:var(--font-mono); font-weight:700;">${r.status}</td>
+          <td style="color:var(--text-secondary);">${r.rationale}</td>
+        </tr>
+      `).join("");
+
+      // Official Exchange Filings (BSE / NSE / SEC EDGAR)
+      const filingsTbody = document.getElementById("filings-table-rows");
+      if (filingsTbody) {
+        if (!d.filings || !d.filings.length) {
+          filingsTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-tertiary); padding:20px;">No exchange filings returned</td></tr>`;
+        } else {
+          filingsTbody.innerHTML = d.filings.map(f => `
+            <tr>
+              <td style="font-family:var(--font-mono); color:var(--text-tertiary);">${f.date || 'Recent'}</td>
+              <td style="font-family:var(--font-mono); font-weight:700; color:var(--accent-blue);">${f.category}</td>
+              <td style="font-weight:600; color:#fff;">${f.headline}</td>
+              <td><span class="market-badge">${f.source}</span></td>
+              <td style="text-align:right;">
+                ${f.pdf_url && f.pdf_url !== '#' ? `<a href="${f.pdf_url}" target="_blank" class="btn-action-primary" style="padding:4px 10px; font-size:11px; text-decoration:none;">VIEW PDF</a>` : '<span style="color:var(--text-tertiary); font-family:var(--font-mono);">SUBMITTED</span>'}
+              </td>
+            </tr>
+          `).join("");
+        }
+      }
+
+      // Insider Transactions
+      const insiderTbody = document.getElementById("insider-table-rows");
+      if (!d.insiders || !d.insiders.length) {
+        insiderTbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-tertiary); padding:20px;">No recent open-market insider filings recorded</td></tr>`;
+      } else {
+        insiderTbody.innerHTML = d.insiders.map(row => `
+          <tr>
+            <td style="font-family:var(--font-mono); color:var(--text-tertiary);">${row.date || 'Recent'}</td>
+            <td style="font-weight:700;">${row.name}</td>
+            <td style="color:var(--text-secondary);">${row.position}</td>
+            <td style="font-family:var(--font-mono); font-weight:700; color:${row.transaction.toLowerCase().includes('purchase') || row.transaction.toLowerCase().includes('buy') ? 'var(--accent-emerald)' : 'var(--accent-crimson)'};">${row.transaction}</td>
+            <td style="text-align:right; font-family:var(--font-mono);">${Number(row.shares).toLocaleString()}</td>
+            <td style="text-align:right; font-family:var(--font-mono); font-weight:700;">${row.value > 0 ? (ccy + Number(row.value).toLocaleString()) : 'Exercise'}</td>
+          </tr>
+        `).join("");
+      }
+
+      // News & Catalysts Wire
+      const wire = document.getElementById("wire-container");
+      if (!d.news || !d.news.length) {
+        wire.innerHTML = `<div style="text-align:center; color:var(--text-tertiary); padding:40px;">No breaking news catalysts found</div>`;
+      } else {
+        wire.innerHTML = d.news.map(n => `
+          <div class="news-tile">
+            <div class="news-tile-head">
+              <span>${n.provider}</span>
+              <span>${n.date}</span>
+            </div>
+            <a href="${n.url}" target="_blank" class="news-link">${n.title}</a>
+            <div class="news-body">${n.summary}</div>
+          </div>
+        `).join("");
+      }
+    }
+
+    // Load RL Policy Status & Failure Audit Ledger
+    async function loadRLStatus() {
+      try {
+        const res = await fetch('/api/rl_status');
+        const d = await res.json();
+        
+        if (d.summary) {
+          document.getElementById("rl-winrate").innerText = `${d.summary.win_rate_pct}%`;
+          document.getElementById("rl-total-records").innerText = d.summary.total_computes;
+          document.getElementById("rl-net-r").innerText = `${d.summary.net_r >= 0 ? '+' : ''}${d.summary.net_r.toFixed(2)} R`;
+        }
+
+        // Render Weights
+        const wGrid = document.getElementById("rl-weights-grid");
+        wGrid.innerHTML = (d.rules || []).map(r => `
+          <div class="control-box">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <span style="font-family:var(--font-mono); font-weight:700; color:#fff;">${r.id}: ${r.name}</span>
+              <span style="font-family:var(--font-mono); font-weight:800; color:var(--accent-cyan); font-size:14px;">${r.weight.toFixed(2)}x</span>
+            </div>
+            <div class="rl-weight-bar-bg">
+              <div class="rl-weight-bar-fill" style="width: ${Math.min(100, (r.weight / 2.0) * 100)}%;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-tertiary); margin-top:6px; font-family:var(--font-mono);">
+              <span>REINFORCED: ${r.wins}</span>
+              <span>PENALIZED: ${r.losses}</span>
+            </div>
+          </div>
+        `).join("");
+
+        // Render Audit Ledger
+        const lRows = document.getElementById("rl-ledger-rows");
+        if (!d.recent_computes || !d.recent_computes.length) {
+          lRows.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-tertiary); padding:20px;">No historical trades recorded in ledger</td></tr>`;
+        } else {
+          lRows.innerHTML = d.recent_computes.map(t => `
+            <tr>
+              <td style="font-family:var(--font-mono); color:var(--text-tertiary);">${t.timestamp}</td>
+              <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-blue);">${t.ticker}</td>
+              <td style="font-family:var(--font-mono); font-weight:700;">${t.call}</td>
+              <td style="font-family:var(--font-mono);">${t.entry.toFixed(2)}</td>
+              <td style="font-family:var(--font-mono); color:var(--accent-crimson);">${t.stop.toFixed(2)}</td>
+              <td style="font-family:var(--font-mono); color:var(--accent-emerald);">${t.target.toFixed(2)}</td>
+              <td style="font-family:var(--font-mono); font-weight:700; color:${t.status === 'WIN' ? 'var(--accent-emerald)' : (t.status === 'LOSS' ? 'var(--accent-crimson)' : 'var(--accent-amber)')};">${t.status}</td>
+              <td style="text-align:right; font-family:var(--font-mono); font-weight:700;">${t.r !== 0 ? (t.r > 0 ? `+${t.r.toFixed(1)}R` : `${t.r.toFixed(1)}R`) : 'In Progress'}</td>
+            </tr>
+          `).join("");
+        }
+      } catch (err) {
+        console.error("RL load error:", err);
+      }
+    }
+
+    // Trigger fast RL training walkforward cycle
+    async function triggerRLCycle() {
+      try {
+        const res = await fetch(`/api/rl_walkforward?ticker=${encodeURIComponent(activeTicker)}`);
+        const wf = await res.json();
+        alert(`RL Re-learning cycle complete for ${wf.ticker}:\nSimulated Trades: ${wf.total_simulated}\nWins: ${wf.wins} | Losses: ${wf.losses}\nWin Rate: ${wf.win_rate_pct}%\nProfit Factor: ${wf.profit_factor}`);
+        loadRLStatus();
+      } catch (e) {
+        console.error("Walkforward error:", e);
+      }
+    }
+
+    // Render Vector SVG Candlestick Chart
+    function renderVectorChart(bars, entry, stop, target) {
+      const svg = document.getElementById("stage-svg");
+      if (!bars || bars.length < 5) {
+        svg.innerHTML = `<text x="400" y="210" fill="#64748b" text-anchor="middle" font-family="'JetBrains Mono'" font-size="13">No chart history</text>`;
+        return;
+      }
+
+      const w = 800, h = 420;
+      const padL = 60, padR = 60, padT = 30, padB = 40;
+
+      let minP = Infinity, maxP = -Infinity;
+      bars.forEach(b => {
+        if (b.low < minP) minP = b.low;
+        if (b.high > maxP) maxP = b.high;
+      });
+      if (stop && stop < minP) minP = stop;
+      if (target && target > maxP) maxP = target;
+
+      const pRange = (maxP - minP) || 1;
+      const pToY = p => padT + (h - padT - padB) * (1 - (p - minP) / pRange);
+
+      const nBars = bars.length;
+      const barW = Math.max(3, (w - padL - padR) / nBars - 2);
+
+      let out = `
+        <defs>
+          <linearGradient id="chartBg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0e131f" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#0a0d14" stop-opacity="0.9"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="${w}" height="${h}" fill="url(#chartBg)" />
+      `;
+
+      // Price grid lines
+      for (let i = 0; i <= 4; i++) {
+        const pVal = minP + (pRange * i / 4);
+        const yVal = pToY(pVal);
+        out += `<line x1="${padL}" y1="${yVal}" x2="${w - padR}" y2="${yVal}" stroke="rgba(255,255,255,0.05)" stroke-width="1" />`;
+        out += `<text x="${padL - 8}" y="${yVal + 4}" fill="#64748b" font-family="'JetBrains Mono'" font-size="10" text-anchor="end">${pVal.toFixed(1)}</text>`;
+      }
+
+      // Candles
+      bars.forEach((b, idx) => {
+        const x = padL + idx * ((w - padL - padR) / nBars) + barW / 2;
+        const yH = pToY(b.high);
+        const yL = pToY(b.low);
+        const yO = pToY(b.open);
+        const yC = pToY(b.close);
+
+        const isUp = b.close >= b.open;
+        const color = isUp ? "var(--accent-emerald)" : "var(--accent-crimson)";
+
+        out += `<line x1="${x + barW/2}" y1="${yH}" x2="${x + barW/2}" y2="${yL}" stroke="${color}" stroke-width="1.2" />`;
+        out += `<rect x="${x}" y="${Math.min(yO, yC)}" width="${barW}" height="${Math.max(2, Math.abs(yC - yO))}" fill="${color}" rx="1" />`;
+      });
+
+      // Overlay Lines
+      if (entry) {
+        const yE = pToY(entry);
+        out += `<line x1="${padL}" y1="${yE}" x2="${w - padR}" y2="${yE}" stroke="var(--accent-blue)" stroke-width="1.5" stroke-dasharray="4,4" />`;
+        out += `<text x="${w - padR + 6}" y="${yE + 4}" fill="var(--accent-blue)" font-family="'JetBrains Mono'" font-size="10" font-weight="700">ENTRY: ${entry.toFixed(1)}</text>`;
+      }
+      if (target) {
+        const yT = pToY(target);
+        out += `<line x1="${padL}" y1="${yT}" x2="${w - padR}" y2="${yT}" stroke="var(--accent-emerald)" stroke-width="1.5" stroke-dasharray="4,4" />`;
+        out += `<text x="${w - padR + 6}" y="${yT + 4}" fill="var(--accent-emerald)" font-family="'JetBrains Mono'" font-size="10" font-weight="700">TARGET: ${target.toFixed(1)}</text>`;
+      }
+      if (stop) {
+        const yS = pToY(stop);
+        out += `<line x1="${padL}" y1="${yS}" x2="${w - padR}" y2="${yS}" stroke="var(--accent-crimson)" stroke-width="1.5" stroke-dasharray="4,4" />`;
+        out += `<text x="${w - padR + 6}" y="${yS + 4}" fill="var(--accent-crimson)" font-family="'JetBrains Mono'" font-size="10" font-weight="700">STOP: ${stop.toFixed(1)}</text>`;
+      }
+
+      svg.innerHTML = out;
+    }
+
+    // Interactive Parametric Backtest Engine
+    async function runInteractiveBacktest() {
+      const sym = document.getElementById("bt-ticker-input").value.trim() || activeTicker;
+      const strategy = document.getElementById("bt-strategy-select").value;
+      const period = document.getElementById("bt-period-select").value;
+      const cap = document.getElementById("bt-cap-input").value;
+      const risk = document.getElementById("bt-risk-input").value;
+
+      try {
+        const url = `/api/backtest?ticker=${encodeURIComponent(sym)}&strategy=${encodeURIComponent(strategy)}&period=${encodeURIComponent(period)}&capital=${encodeURIComponent(cap)}&risk=${encodeURIComponent(risk)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.error) {
+          alert("Backtest Notice: " + data.error);
+          return;
+        }
+
+        // Populate KPIs
+        const retColor = data.net_return_pct >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+        document.getElementById("bt-net-ret").innerText = (data.net_return_pct >= 0 ? "+" : "") + data.net_return_pct + "%";
+        document.getElementById("bt-net-ret").style.color = retColor;
+
+        document.getElementById("bt-sharpe").innerText = data.sharpe_ratio.toFixed(2);
+        document.getElementById("bt-sortino").innerText = data.sortino_ratio ? data.sortino_ratio.toFixed(2) : "--";
+        document.getElementById("bt-max-dd").innerText = data.max_drawdown_pct + "%";
+        document.getElementById("bt-win-rate").innerText = data.win_rate_pct + "%";
+        document.getElementById("bt-profit-factor").innerText = data.profit_factor.toFixed(2);
+        document.getElementById("bt-total-trades").innerText = data.total_trades + " (" + data.wins + "W / " + data.losses + "L)";
+
+        // Render SVG Equity Curve
+        renderBacktestEquityChart(data.equity_curve || [], data.initial_capital);
+
+        // Render Trade Log
+        const tbody = document.getElementById("bt-trade-log-rows");
+        if (data.trade_log && data.trade_log.length > 0) {
+          tbody.innerHTML = data.trade_log.map(t => {
+            const pnlColor = t.pnl >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+            const sideColor = t.type === "LONG" || t.type.includes("BUY") ? "var(--accent-emerald)" : "var(--accent-crimson)";
+            return `
+              <tr>
+                <td style="font-family:var(--font-mono);">${t.entry_date}</td>
+                <td style="font-family:var(--font-mono);">${t.exit_date}</td>
+                <td style="font-weight:700; color:${sideColor};">${t.type}</td>
+                <td style="font-family:var(--font-mono);">${t.entry.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">${t.exit.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">${t.shares.toLocaleString()}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:${pnlColor};">${t.pnl >= 0 ? '+' : ''}${t.pnl.toLocaleString()}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:${pnlColor};">${t.r_multiple >= 0 ? '+' : ''}${t.r_multiple}R</td>
+                <td style="color:var(--text-secondary);">${t.exit_reason}</td>
+              </tr>
+            `;
+          }).reverse().join("");
+        } else {
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--text-tertiary); padding:16px;">Zero trade executions during selected horizon.</td></tr>`;
+        }
+      } catch (err) {
+        console.error("Backtest execution error:", err);
+      }
+    }
+
+    // Render Backtest Equity SVG Chart
+    function renderBacktestEquityChart(points, initCap) {
+      const svg = document.getElementById("bt-equity-svg");
+      if (!points || points.length < 2) {
+        svg.innerHTML = `<text x="400" y="160" text-anchor="middle" fill="#8b949e" font-family="monospace">Insufficient data for equity curve</text>`;
+        return;
+      }
+
+      const W = 800;
+      const H = 320;
+      const padL = 60, padR = 20, padT = 20, padB = 40;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const equities = points.map(p => p.equity);
+      const minEq = Math.min(...equities, initCap * 0.95);
+      const maxEq = Math.max(...equities, initCap * 1.05);
+      const rangeEq = (maxEq - minEq) || 1;
+
+      const n = points.length;
+      const coords = points.map((p, i) => {
+        const x = padL + (i / (n - 1)) * plotW;
+        const y = padT + plotH - ((p.equity - minEq) / rangeEq) * plotH;
+        return { x, y, date: p.date, equity: p.equity, dd: p.drawdown || 0 };
+      });
+
+      const lineD = coords.map((c, i) => (i === 0 ? `M ${c.x.toFixed(1)} ${c.y.toFixed(1)}` : `L ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)).join(" ");
+      const areaD = `${lineD} L ${coords[coords.length - 1].x.toFixed(1)} ${H - padB} L ${coords[0].x.toFixed(1)} ${H - padB} Z`;
+
+      // Baseline Y for initial capital
+      const baseCapY = padT + plotH - ((initCap - minEq) / rangeEq) * plotH;
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="eq-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="${padL}" y1="${padT}" x2="${W - padR}" y2="${padT}" stroke="#30363d" stroke-dasharray="2,2"/>
+        <line x1="${padL}" y1="${padT + plotH / 2}" x2="${W - padR}" y2="${padT + plotH / 2}" stroke="#30363d" stroke-dasharray="2,2"/>
+        <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#30363d"/>
+        
+        <!-- Initial Capital Baseline -->
+        <line x1="${padL}" y1="${baseCapY}" x2="${W - padR}" y2="${baseCapY}" stroke="rgba(255,255,255,0.2)" stroke-dasharray="3,3"/>
+        <text x="${W - padR}" y="${baseCapY - 4}" text-anchor="end" fill="#8b949e" font-size="10" font-family="monospace">Base: ${initCap.toLocaleString()}</text>
+
+        <!-- Area & Stroke -->
+        <path d="${areaD}" fill="url(#eq-grad)"/>
+        <path d="${lineD}" fill="none" stroke="#3b82f6" stroke-width="2.2" stroke-linecap="round"/>
+
+        <!-- Y Axis Labels -->
+        <text x="${padL - 8}" y="${padT + 10}" text-anchor="end" fill="#8b949e" font-size="10" font-family="monospace">${maxEq.toFixed(0)}</text>
+        <text x="${padL - 8}" y="${H - padB}" text-anchor="end" fill="#8b949e" font-size="10" font-family="monospace">${minEq.toFixed(0)}</text>
+
+        <!-- X Axis Dates -->
+        <text x="${padL}" y="${H - 12}" text-anchor="start" fill="#8b949e" font-size="10" font-family="monospace">${coords[0].date}</text>
+        <text x="${W - padR}" y="${H - 12}" text-anchor="end" fill="#8b949e" font-size="10" font-family="monospace">${coords[coords.length - 1].date}</text>
+      `;
+    }
+
+    // Load Autonomous 24/7 Dashboard
+    async function loadAutonomousDashboard() {
+      try {
+        const res = await fetch('/api/autonomous_dashboard');
+        const d = await res.json();
+        if (d.error) return;
+
+        // 1. Radar rows
+        const radarTbody = document.getElementById("auto-radar-rows");
+        if (d.radar && d.radar.length > 0) {
+          radarTbody.innerHTML = d.radar.map(r => {
+            let badgeClass = "badge-neutral";
+            let color = "var(--text-secondary)";
+            if (r.timing_verdict.includes("ENTER NOW (LONG)")) {
+              color = "var(--accent-emerald)";
+            } else if (r.timing_verdict.includes("WAIT FOR PULLBACK")) {
+              color = "var(--accent-amber)";
+            } else if (r.timing_verdict.includes("ENTER NOW (SHORT)")) {
+              color = "var(--accent-crimson)";
+            } else if (r.timing_verdict.includes("WAIT FOR RELIEF")) {
+              color = "var(--accent-purple)";
+            } else if (r.timing_verdict.includes("EXIT")) {
+              color = "var(--accent-crimson)";
+            }
+            return `
+              <tr onclick="loadSymbol('${r.ticker}')">
+                <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-blue);">${r.ticker}</td>
+                <td><span style="display:inline-block; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px; font-family:var(--font-mono); border:1px solid ${color}; color:${color};">${r.timing_verdict}</span></td>
+                <td style="font-family:var(--font-mono); font-weight:700;">${(r.confidence * 100).toFixed(0)}%</td>
+                <td style="font-family:var(--font-mono); font-weight:700;">₹${r.current_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-cyan); font-weight:700;">₹${r.recommended_entry.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-crimson);">₹${r.stop_loss.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-emerald);">₹${r.target_price.toFixed(2)}</td>
+                <td style="color:var(--text-secondary); font-size:12px;">${r.action_summary}</td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          radarTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-tertiary); padding:14px;">Surveillance sweep initializing...</td></tr>`;
+        }
+
+        // 2. Open positions rows
+        const openTbody = document.getElementById("auto-open-positions-rows");
+        if (d.open_positions && d.open_positions.length > 0) {
+          openTbody.innerHTML = d.open_positions.map(p => {
+            const pnlColor = p.unrealized_pnl >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+            return `
+              <tr onclick="loadSymbol('${p.ticker}')">
+                <td style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">${p.timestamp}</td>
+                <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-blue);">${p.ticker}</td>
+                <td style="font-weight:700; color:var(--accent-emerald);">${p.action}</td>
+                <td style="font-family:var(--font-mono);">₹${p.entry_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:700;">₹${p.current_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-crimson);">₹${p.stop_loss.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-emerald);">₹${p.target_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">${p.shares.toLocaleString()}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:${pnlColor};">${p.unrealized_pnl >= 0 ? '+' : ''}₹${p.unrealized_pnl.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:${pnlColor};">${p.unrealized_r >= 0 ? '+' : ''}${p.unrealized_r.toFixed(2)}R</td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          openTbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--text-tertiary); padding:14px;">No active open positions currently open.</td></tr>`;
+        }
+
+        // 3. Closed positions rows
+        const closedTbody = document.getElementById("auto-closed-positions-rows");
+        if (d.closed_positions && d.closed_positions.length > 0) {
+          closedTbody.innerHTML = d.closed_positions.map(p => {
+            const rColor = p.realized_r >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+            return `
+              <tr>
+                <td style="font-family:var(--font-mono); font-size:11px; color:var(--text-tertiary);">${p.timestamp}</td>
+                <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-blue);">${p.ticker}</td>
+                <td style="font-weight:700;">${p.action}</td>
+                <td style="font-family:var(--font-mono);">₹${p.entry_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">₹${p.exit_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">${p.shares.toLocaleString()}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:${rColor};">${p.realized_r >= 0 ? '+' : ''}${p.realized_r.toFixed(2)}R</td>
+                <td style="color:var(--text-secondary);">${p.exit_reason}</td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          closedTbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-tertiary); padding:14px;">Zero closed trades in ledger.</td></tr>`;
+        }
+      } catch (err) {
+        console.error("Dashboard refresh error:", err);
+      }
+    }
+
+    // High-Frequency Real-Time Sub-Second Tick Streamer
+    let lastTickPrice = null;
+    async function pollFastTicks() {
+      try {
+        const sym = activeTicker;
+        const res = await fetch(`/api/live_ticks?ticker=${encodeURIComponent(sym)}`);
+        const tick = await res.json();
+        if (tick && tick.last_price) {
+          document.getElementById("nav-tick-sym").innerText = tick.symbol;
+          const currSign = tick.currency === "INR" ? "₹" : "$";
+          const pxEl = document.getElementById("nav-tick-px");
+          pxEl.innerText = currSign + tick.last_price.toFixed(2);
+          
+          if (tick.iso_time_ms) {
+            const timePart = tick.iso_time_ms.split(" ")[1] || tick.iso_time_ms;
+            document.getElementById("nav-tick-ms").innerText = "[" + timePart + "]";
+          }
+
+          if (lastTickPrice !== null) {
+            if (tick.last_price > lastTickPrice) {
+              pxEl.style.color = "var(--accent-emerald)";
+            } else if (tick.last_price < lastTickPrice) {
+              pxEl.style.color = "var(--accent-crimson)";
+            }
+          }
+          lastTickPrice = tick.last_price;
+        }
+      } catch (err) {
+        // silent fail for non-blocking stream
+      }
+    }
+    // High-frequency polling every 350ms
+    setInterval(pollFastTicks, 350);
+
+    // Relentless Neural Network Telemetry Polling (every 800ms)
+    async function pollNeuralTelemetry() {
+      try {
+        const res = await fetch('/api/neural_telemetry');
+        const d = await res.json();
+        if (d && d.epochs_completed !== undefined) {
+          const epochStr = d.epochs_completed.toLocaleString();
+          const epochEl = document.getElementById("nn-epoch-stat");
+          if (epochEl) epochEl.innerText = epochStr;
+
+          const bEpoch = document.getElementById("nn-banner-epochs");
+          if (bEpoch) bEpoch.innerText = epochStr;
+
+          const bLoss = document.getElementById("nn-banner-loss");
+          if (bLoss) bLoss.innerText = d.latest_loss.toFixed(5);
+
+          const bGrad = document.getElementById("nn-banner-grad");
+          if (bGrad) bGrad.innerText = d.latest_grad_norm.toFixed(4);
+
+          const bBuf = document.getElementById("nn-banner-buf");
+          if (bBuf) bBuf.innerText = d.buffer_size.toLocaleString() + " / " + d.buffer_capacity.toLocaleString();
+        }
+      } catch (err) {
+        // silent fail
+      }
+    }
+    setInterval(pollNeuralTelemetry, 800);
+    pollNeuralTelemetry();
+
+    // Populate Radar Watchlist
+    async function loadRadarWatchlist() {
+      try {
+        const res = await fetch('/api/watchlist');
+        const list = await res.json();
+        const tbody = document.getElementById("radar-watchlist-rows");
+        tbody.innerHTML = list.map(item => `
+          <tr onclick="loadSymbol('${item.symbol}')">
+            <td style="font-family:var(--font-mono); font-weight:800; color:var(--accent-blue);">${item.symbol}</td>
+            <td style="font-weight:700;">${item.name}</td>
+            <td><span class="market-badge">${item.exchange}</span></td>
+            <td style="color:var(--text-secondary);">${item.sector}</td>
+            <td style="font-family:var(--font-mono); color:var(--accent-amber); font-weight:700;">${item.cap}</td>
+            <td><button class="pill-btn" onclick="loadSymbol('${item.symbol}')">LOAD</button></td>
+          </tr>
+        `).join("");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function recalcRisk() {
+      executeCompute(activeTicker);
+    }
+
+    function preset5KBacktest() {
+      document.getElementById("bt-cap-input").value = 5000;
+      document.getElementById("bt-risk-input").value = 1.5;
+      document.getElementById("bt-period-select").value = "1y";
+      document.getElementById("bt-ticker-input").value = "TATASTEEL.NS";
+      runInteractiveBacktest();
+    }
+
+    // 5K INR Portfolio Manager Client Engine
+    async function loadPortfolio5K() {
+      try {
+        const res = await fetch('/api/portfolio_5k');
+        const d = await res.json();
+        if (d.error) return;
+
+        const retSign = d.total_return_pct >= 0 ? "+" : "";
+        const retColor = d.total_return_pct >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+
+        document.getElementById("p5k-equity").innerText = `INR ${d.equity.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        document.getElementById("p5k-return-badge").innerText = `Net Return: ${retSign}${d.total_return_pct.toFixed(2)}% (INR ${retSign}${d.total_net_pnl.toFixed(2)})`;
+        document.getElementById("p5k-return-badge").style.color = retColor;
+
+        document.getElementById("p5k-cash").innerText = `INR ${d.current_cash.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+        document.getElementById("p5k-margin-allocated").innerText = `Margin In Use: INR ${d.allocated_margin.toFixed(2)}`;
+
+        document.getElementById("p5k-net-pnl").innerText = `${d.realized_net_pnl >= 0 ? '+' : ''}INR ${d.realized_net_pnl.toFixed(2)}`;
+        document.getElementById("p5k-net-pnl").style.color = d.realized_net_pnl >= 0 ? "var(--accent-cyan)" : "var(--accent-crimson)";
+        document.getElementById("p5k-gross-badge").innerText = `Gross: INR ${d.realized_gross_pnl.toFixed(2)}`;
+
+        document.getElementById("p5k-total-charges").innerText = `INR ${d.total_charges.toFixed(2)}`;
+        document.getElementById("p5k-winrate").innerText = `${d.win_rate_pct.toFixed(1)}%`;
+        document.getElementById("p5k-trade-counts").innerText = `${d.winning_trades}W / ${d.losing_trades}L`;
+        document.getElementById("p5k-total-trades").innerText = d.total_trades;
+
+        // Statutory Taxes Breakdown
+        document.getElementById("tax-brokerage").innerText = `INR ${d.total_brokerage.toFixed(2)}`;
+        document.getElementById("tax-stt").innerText = `INR ${d.total_stt.toFixed(2)}`;
+        document.getElementById("tax-exch").innerText = `INR ${d.total_exchange_txn.toFixed(2)}`;
+        document.getElementById("tax-sebi").innerText = `INR ${d.total_sebi.toFixed(2)}`;
+        document.getElementById("tax-stamp").innerText = `INR ${d.total_stamp_duty.toFixed(2)}`;
+        document.getElementById("tax-gst").innerText = `INR ${d.total_gst.toFixed(2)}`;
+        document.getElementById("tax-dp").innerText = `INR ${d.total_dp_charges.toFixed(2)}`;
+        document.getElementById("tax-slip").innerText = `INR ${d.total_slippage.toFixed(2)}`;
+
+        // Open Positions Rows
+        const posTbody = document.getElementById("p5k-positions-rows");
+        if (d.open_positions && d.open_positions.length > 0) {
+          posTbody.innerHTML = d.open_positions.map(p => {
+            const pnlColor = p.unrealized_net_pnl >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+            return `
+              <tr>
+                <td style="font-weight:800; color:#fff; font-family:var(--font-mono);">${p.ticker}</td>
+                <td style="font-weight:700; color:var(--accent-emerald);">${p.side}</td>
+                <td><span class="badge" style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:var(--accent-blue);">${p.order_type}</span></td>
+                <td style="font-family:var(--font-mono);">₹${p.entry_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:#fff;">₹${p.current_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-crimson);">₹${p.stop_loss.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-emerald);">₹${p.target_price.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:700;">${p.quantity}</td>
+                <td style="font-family:var(--font-mono);">₹${p.allocated_cash.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">${p.unrealized_gross_pnl >= 0 ? '+' : ''}₹${p.unrealized_gross_pnl.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-amber);">₹${p.estimated_charges.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:800; color:${pnlColor};">${p.unrealized_net_pnl >= 0 ? '+' : ''}₹${p.unrealized_net_pnl.toFixed(2)}</td>
+                <td>
+                  <button class="pill-btn" style="padding:2px 8px; font-size:10px; border-color:var(--accent-crimson); color:var(--accent-crimson);" onclick="close5KPosition(${p.id}, ${p.current_price})">CLOSE MKT</button>
+                </td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          posTbody.innerHTML = `<tr><td colspan="13" style="text-align:center; color:var(--text-tertiary); font-family:var(--font-mono); padding:16px;">Zero active open positions in 5K portfolio. Available cash ready for signal entry.</td></tr>`;
+        }
+
+        // Closed Trades Rows
+        const legTbody = document.getElementById("p5k-ledger-rows");
+        if (d.recent_trades && d.recent_trades.length > 0) {
+          legTbody.innerHTML = d.recent_trades.map(t => {
+            const pnlColor = t.net_pnl >= 0 ? "var(--accent-emerald)" : "var(--accent-crimson)";
+            return `
+              <tr>
+                <td style="font-family:var(--font-mono); font-size:11px;">${t.exit_time}</td>
+                <td style="font-weight:800; font-family:var(--font-mono);">${t.ticker}</td>
+                <td style="font-weight:700; color:${t.side === 'BUY' ? 'var(--accent-emerald)' : 'var(--accent-crimson)'};">${t.side}</td>
+                <td style="font-family:var(--font-mono);">${t.qty}</td>
+                <td style="font-family:var(--font-mono);">₹${t.entry_px.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">₹${t.exit_px.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono);">${t.gross_pnl >= 0 ? '+' : ''}₹${t.gross_pnl.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); color:var(--accent-amber);">₹${t.total_charges.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:800; color:${pnlColor};">${t.net_pnl >= 0 ? '+' : ''}₹${t.net_pnl.toFixed(2)}</td>
+                <td style="font-family:var(--font-mono); font-weight:700; color:${t.r_multiple >= 0 ? 'var(--accent-emerald)' : 'var(--accent-crimson)'};">${t.r_multiple >= 0 ? '+' : ''}${t.r_multiple}R</td>
+                <td><span class="badge" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); font-size:10px;">${t.exit_reason}</span></td>
+                <td style="font-family:var(--font-mono); font-weight:800; color:#fff;">₹${t.portfolio_equity_after.toFixed(2)}</td>
+              </tr>
+            `;
+          }).join("");
+        } else {
+          legTbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:var(--text-tertiary); font-family:var(--font-mono); padding:16px;">Zero closed trades in ledger.</td></tr>`;
+        }
+      } catch (err) {
+        console.error("Error loading 5K portfolio:", err);
+      }
+    }
+
+    async function execute5KSignalTrade() {
+      try {
+        const topTickers = ["TATASTEEL.NS", "IOC.NS", "PNB.NS", "SUZLON.NS", "CDSL.NS"];
+        const sym = topTickers[Math.floor(Math.random() * topTickers.length)];
+        const res = await fetch(`/api/portfolio_5k/execute?ticker=${encodeURIComponent(sym)}&side=BUY&order_type=INTRADAY`);
+        const d = await res.json();
+        if (d.status === "EXECUTED") {
+          alert(`5K Trade Executed:\n${d.message}`);
+        } else {
+          alert(`Trade Notice: ${d.reason || d.error || "Execution skipped"}`);
+        }
+        loadPortfolio5K();
+      } catch (e) {
+        alert("Execution error: " + e.message);
+      }
+    }
+
+    async function close5KPosition(posId, exitPx) {
+      try {
+        const res = await fetch(`/api/portfolio_5k/close?pos_id=${posId}&exit_price=${exitPx}&reason=MANUAL_EXIT`);
+        const d = await res.json();
+        loadPortfolio5K();
+      } catch (e) {
+        console.error("Close position error:", e);
+      }
+    }
+
+    async function resetPortfolio5K() {
+      if (!confirm("Reset 5K INR Portfolio to initial base capital of INR 5,000.00?")) return;
+      try {
+        await fetch('/api/portfolio_5k/reset');
+        loadPortfolio5K();
+      } catch (e) {
+        console.error("Reset error:", e);
+      }
+    }
+
+    document.getElementById("sym-input").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") executeCompute(e.target.value);
+    });
+    document.getElementById("btn-run").addEventListener("click", () => {
+      executeCompute(document.getElementById("sym-input").value);
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      executeCompute("SUZLON.NS");
+      loadRadarWatchlist();
+      loadRLStatus();
+      loadAutonomousDashboard();
+      runInteractiveBacktest();
+      loadPortfolio5K();
+    });
+  </script>
+</body>
+</html>
