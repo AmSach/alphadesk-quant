@@ -368,6 +368,13 @@ class Portfolio5KManager:
 
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
+
+        # Disallow duplicate open position in same ticker
+        cur.execute("SELECT COUNT(*) FROM portfolio_positions WHERE ticker = ? AND status = 'OPEN'", (ticker,))
+        if cur.fetchone()[0] > 0:
+            conn.close()
+            return {"status": "REJECTED", "reason": f"Position already open in {ticker}"}
+
         now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         exchange = "BSE" if "BO" in ticker.upper() or "5" in ticker else "NSE"

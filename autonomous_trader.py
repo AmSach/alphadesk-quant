@@ -855,19 +855,19 @@ class AutonomousRLEngine:
                             VALUES (?, ?, 'BUY', ?, ?, ?, ?, 'OPEN', ?, 0.0, 0.0)
                             """, (now_str, sym, curr_px, timing["stop_loss"], timing["target_price"], shares, curr_px))
 
-                            # 5K Portfolio execution hook
-                            try:
-                                if sym in ["SUZLON.NS", "TATASTEEL.NS", "IOC.NS", "PNB.NS", "IREDA.NS", "CDSL.NS"]:
-                                    portfolio_5k.execute_trade(
-                                        ticker=sym,
-                                        side="BUY",
-                                        order_type="INTRADAY",
-                                        entry_price=curr_px,
-                                        stop_loss=timing["stop_loss"],
-                                        target_price=timing["target_price"]
-                                    )
-                            except Exception:
-                                pass
+                        # 5K Portfolio execution hook (independent micro-capital risk gate)
+                        try:
+                            if sym in ["SUZLON.NS", "TATASTEEL.NS", "IOC.NS", "PNB.NS", "IREDA.NS", "CDSL.NS"]:
+                                portfolio_5k.execute_trade(
+                                    ticker=sym,
+                                    side="BUY",
+                                    order_type="INTRADAY",
+                                    entry_price=curr_px,
+                                    stop_loss=timing["stop_loss"],
+                                    target_price=timing["target_price"]
+                                )
+                        except Exception:
+                            pass
 
                 # Update 5K INR Portfolio MTM prices and exit triggers
                 try:
