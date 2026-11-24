@@ -530,7 +530,8 @@ class AutonomousRLEngine:
                         exit_price=exit_px,
                         quantity=pos_shares,
                         order_type=order_mode,
-                        exchange=exchange
+                        exchange=exchange,
+                        side="SELL" if pos_type == "SHORT" else "BUY"
                     )
                     gross_trade_pnl = charge_res["gross_pnl"]
                     trade_charges = charge_res["total_charges"]

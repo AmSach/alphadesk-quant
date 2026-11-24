@@ -382,7 +382,7 @@ class Portfolio5KManager:
         exchange = "BSE" if "BO" in ticker.upper() or "5" in ticker else "NSE"
 
         # Calculate initial estimated charges
-        est_charges = IndianBrokerFeeModel.calculate_charges(px, px, qty, order_type, exchange)
+        est_charges = IndianBrokerFeeModel.calculate_charges(px, px, qty, order_type, exchange, side=side)
 
         cur.execute("""
         INSERT INTO portfolio_positions (
@@ -445,7 +445,8 @@ class Portfolio5KManager:
             exit_price=exit_price,
             quantity=qty,
             order_type=order_type,
-            exchange=exchange
+            exchange=exchange,
+            side=side
         )
 
         gross_pnl = charges["gross_pnl"]

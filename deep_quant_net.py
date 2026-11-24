@@ -26,9 +26,9 @@ class DuelingQNetwork(nn.Module):
     Dueling Deep Q-Network Architecture.
     Separates state-value V(s) from action-advantage A(s, a).
     Inputs: 16 continuous market feature dimensions.
-    Outputs: 4 discrete actions [0: CASH, 1: BUY_LONG, 2: SELL_SHORT, 3: EXIT].
+    Outputs: 3 discrete actions [0: CASH / NEUTRAL, 1: BUY_LONG, 2: SELL_SHORT].
     """
-    def __init__(self, input_dim=16, action_dim=4):
+    def __init__(self, input_dim=16, action_dim=3):
         super(DuelingQNetwork, self).__init__()
         
         # Feature representation backbone
@@ -72,7 +72,7 @@ class RelentlessNeuralEngine:
     Relentless Background Deep Neural Network Training & Inference Worker.
     Trains continuously in the background, minimizing Bellman TD error on market state transitions.
     """
-    def __init__(self, input_dim=16, action_dim=4):
+    def __init__(self, input_dim=16, action_dim=3):
         self.input_dim = input_dim
         self.action_dim = action_dim
         self.device = DEVICE
@@ -87,7 +87,7 @@ class RelentlessNeuralEngine:
         
         self.replay_buffer = deque(maxlen=50000)
         self.batch_size = 64
-        self.gamma = 0.95
+        self.gamma = 0.88
         self.tau = 0.005 # Polyak target update rate
         
         self.is_training = False
@@ -147,7 +147,7 @@ class RelentlessNeuralEngine:
             x = torch.from_numpy(feature_vec).unsqueeze(0).to(self.device)
             q_vals = self.policy_net(x).squeeze(0).cpu().numpy()
             
-            # Action: 0: CASH, 1: BUY_LONG, 2: SELL_SHORT, 3: EXIT
+            # Action: 0: CASH / NEUTRAL, 1: BUY_LONG, 2: SELL_SHORT
             best_act = int(np.argmax(q_vals))
             # Softmax confidence
             exp_q = np.exp(q_vals - np.max(q_vals))

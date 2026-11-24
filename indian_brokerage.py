@@ -15,11 +15,13 @@ class IndianBrokerFeeModel:
         quantity: int,
         order_type: str = "INTRADAY", # "INTRADAY" (MIS) or "DELIVERY" (CNC)
         exchange: str = "NSE",         # "NSE" or "BSE"
-        broker: str = "ZERODHA"        # "ZERODHA", "GROWW", "ANGELONE"
+        broker: str = "ZERODHA",       # "ZERODHA", "GROWW", "ANGELONE"
+        side: str = "BUY"              # "BUY" (Long) or "SELL" (Short)
     ) -> Dict[str, Any]:
         """
         Calculates exact statutory charges and net P&L for Indian Equity trades.
         Strictly adheres to SEBI, Indian Stamp Act, and Finance Act norms.
+        Supports both Long (BUY) and Short (SELL) executions.
         """
         if quantity <= 0 or entry_price <= 0 or exit_price <= 0:
             return {
@@ -41,10 +43,18 @@ class IndianBrokerFeeModel:
                 "cost_drag_pct": 0.0
             }
 
-        turnover_buy = float(entry_price * quantity)
-        turnover_sell = float(exit_price * quantity)
+        is_short = str(side).upper() == "SELL"
+
+        if is_short:
+            turnover_sell = float(entry_price * quantity)
+            turnover_buy = float(exit_price * quantity)
+            gross_pnl = turnover_sell - turnover_buy
+        else:
+            turnover_buy = float(entry_price * quantity)
+            turnover_sell = float(exit_price * quantity)
+            gross_pnl = turnover_sell - turnover_buy
+
         total_turnover = turnover_buy + turnover_sell
-        gross_pnl = turnover_sell - turnover_buy
 
         # 1. Brokerage Calculation
         if order_type.upper() == "DELIVERY":
