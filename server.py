@@ -604,10 +604,10 @@ class AlphaDeskHandler(SimpleHTTPRequestHandler):
             order_type = params.get("order_type", ["INTRADAY"])[0]
             try:
                 res = trader_engine.run_multiyear_backtest(ticker, period=period, capital=capital, risk_pct=risk_pct, strategy=strategy, order_type=order_type)
-                status = 200 if "error" not in res else 400
+                status = 200
             except Exception as e:
                 res = {"error": f"Backtest failed: {str(e)}"}
-                status = 500
+                status = 200
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
