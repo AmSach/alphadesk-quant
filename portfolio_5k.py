@@ -358,7 +358,8 @@ class Portfolio5KManager:
         tp = target_price if target_price and target_price > 0 else round(px + 2.5 * atr, 2)
 
         qty = shares if shares and shares > 0 else self.calculate_position_size(ticker, px, sl)
-        required_cash = round(px * qty, 2)
+        margin_pct = 0.20 if str(order_type).upper() == "INTRADAY" else 1.0
+        required_cash = round(px * qty * margin_pct, 2)
 
         if not self.can_open_position(required_cash):
             return {
