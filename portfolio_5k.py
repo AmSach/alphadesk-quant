@@ -342,7 +342,8 @@ class Portfolio5KManager:
         entry_price: Optional[float] = None,
         stop_loss: Optional[float] = None,
         target_price: Optional[float] = None,
-        shares: Optional[int] = None
+        shares: Optional[int] = None,
+        timestamp: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Opens a new trade position in the 5K INR portfolio.
@@ -376,7 +377,7 @@ class Portfolio5KManager:
             conn.close()
             return {"status": "REJECTED", "reason": f"Position already open in {ticker}"}
 
-        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_str = timestamp if timestamp else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         exchange = "BSE" if "BO" in ticker.upper() or "5" in ticker else "NSE"
 
@@ -417,7 +418,7 @@ class Portfolio5KManager:
             "message": f"Bought {qty} shares of {ticker} at INR {px:.2f}. Total INR {required_cash:.2f} allocated."
         }
 
-    def close_position(self, pos_id: int, exit_price: float, exit_reason: str = "MANUAL_EXIT") -> Dict[str, Any]:
+    def close_position(self, pos_id: int, exit_price: float, exit_reason: str = "MANUAL_EXIT", timestamp: Optional[str] = None) -> Dict[str, Any]:
         """
         Closes an open position, computes statutory charges, updates cash, and logs to ledger.
         """
@@ -436,7 +437,7 @@ class Portfolio5KManager:
             return {"status": "ERROR", "message": f"No open position with ID {pos_id}"}
 
         ticker, exchange, order_type, side, entry_time, entry_px, sl, tp, qty, allocated_cash = row
-        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_str = timestamp if timestamp else datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Compute exact statutory taxes and brokerage
         charges = IndianBrokerFeeModel.calculate_charges(
