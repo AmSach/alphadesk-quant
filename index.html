@@ -1825,6 +1825,10 @@
         document.getElementById("bt-win-rate").innerText = data.win_rate_pct + "%";
         document.getElementById("bt-profit-factor").innerText = data.profit_factor.toFixed(2);
         document.getElementById("bt-total-trades").innerText = data.total_trades + " (" + data.wins + "W / " + data.losses + "L)";
+        const chgEl = document.getElementById("bt-charges");
+        if (chgEl) {
+          chgEl.innerText = data.total_broker_charges !== undefined ? ("INR " + Number(data.total_broker_charges).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})) : "INR 0.00";
+        }
 
         // Render SVG Equity Curve
         renderBacktestEquityChart(data.equity_curve || [], data.initial_capital);
@@ -2150,7 +2154,7 @@
             return `
               <tr>
                 <td style="font-weight:800; color:#fff; font-family:var(--font-mono);">${p.ticker}</td>
-                <td style="font-weight:700; color:var(--accent-emerald);">${p.side}</td>
+                <td style="font-weight:700; color:${p.side === 'BUY' ? 'var(--accent-emerald)' : 'var(--accent-crimson)'};">${p.side}</td>
                 <td><span class="badge" style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:var(--accent-blue);">${p.order_type}</span></td>
                 <td style="font-family:var(--font-mono);">₹${p.entry_price.toFixed(2)}</td>
                 <td style="font-family:var(--font-mono); font-weight:700; color:#fff;">₹${p.current_price.toFixed(2)}</td>

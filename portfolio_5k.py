@@ -288,8 +288,8 @@ class Portfolio5KManager:
             "updated_at": row[20]
         }
 
-    def can_open_position(self, required_cash: float) -> bool:
-        """Enforces 5K INR strict capital discipline."""
+    def can_open_position(self, required_cash: float, max_concurrent: int = 4) -> bool:
+        """Enforces 5K INR strict capital discipline with multi-slot MIS allocation."""
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
         cur.execute("SELECT current_cash FROM portfolio_state WHERE id = 1")
@@ -298,10 +298,10 @@ class Portfolio5KManager:
         open_cnt = cur.fetchone()[0]
         conn.close()
 
-        # Allow max 2 concurrent positions in 5K account to prevent overexposure
-        if open_cnt >= 2:
+        # Allow max_concurrent positions (default 4 slots ~24% margin each) in 5K account
+        if open_cnt >= max_concurrent:
             return False
-        if cash < required_cash or cash < 500.0:
+        if cash < required_cash or cash < 300.0:
             return False
         return True
 
@@ -353,10 +353,15 @@ class Portfolio5KManager:
         current_px = tick["last_price"] if tick else 65.0
         px = entry_price if entry_price and entry_price > 0 else current_px
 
-        # Determine Stop & Target if not passed
-        atr = round(px * 0.03, 2)
-        sl = stop_loss if stop_loss and stop_loss > 0 else round(px - 1.5 * atr, 2)
-        tp = target_price if target_price and target_price > 0 else round(px + 2.5 * atr, 2)
+        # Determine Stop & Target if not passed (direction-aware for LONG and SHORT)
+        atr = round(px * 0.025, 2)
+        is_short_order = str(side).upper() == "SELL"
+        if is_short_order:
+            sl = stop_loss if stop_loss and stop_loss > 0 else round(px + 1.5 * atr, 2)
+            tp = target_price if target_price and target_price > 0 else round(px - 2.5 * atr, 2)
+        else:
+            sl = stop_loss if stop_loss and stop_loss > 0 else round(px - 1.5 * atr, 2)
+            tp = target_price if target_price and target_price > 0 else round(px + 2.5 * atr, 2)
 
         qty = shares if shares and shares > 0 else self.calculate_position_size(ticker, px, sl)
         margin_pct = 0.20 if str(order_type).upper() == "INTRADAY" else 1.0
@@ -559,38 +564,50 @@ class Portfolio5KManager:
                 continue
 
             curr_px = tick["last_price"]
-            charges = IndianBrokerFeeModel.calculate_charges(entry_px, curr_px, qty, otype, exch)
+            charges = IndianBrokerFeeModel.calculate_charges(entry_px, curr_px, qty, otype, exch, side=side)
             unreal_gross = charges["gross_pnl"]
             unreal_net = charges["net_pnl"]
 
-            # Ratchet trailing stop if in profit
+            # Ratchet trailing stop if in profit (supports both BUY/LONG and SELL/SHORT)
             new_trailing = trailing_sl
             atr = entry_px * 0.025
-            if curr_px > entry_px + 1.2 * atr:
-                new_trailing = max(trailing_sl, curr_px - 1.2 * atr)
-
-            effective_stop = max(sl, new_trailing)
-
-            # Check Exit Conditions
-            if curr_px >= tp:
-                self.close_position(pos_id, tp, exit_reason="TARGET_HIT (+2.5R)")
-            elif curr_px <= effective_stop:
-                reason = "TRAILING_STOP" if effective_stop > sl else "STOP_LOSS (-1R)"
-                self.close_position(pos_id, effective_stop, exit_reason=reason)
+            is_short_pos = str(side).upper() == "SELL"
+            if is_short_pos:
+                if curr_px < entry_px - 1.2 * atr:
+                    new_trailing = min(trailing_sl, curr_px + 1.2 * atr)
+                effective_stop = min(sl, new_trailing)
+                if curr_px <= tp:
+                    self.close_position(pos_id, tp, exit_reason="TARGET_HIT (+2.5R)")
+                    continue
+                elif curr_px >= effective_stop:
+                    reason = "TRAILING_STOP" if effective_stop < sl else "STOP_LOSS (-1R)"
+                    self.close_position(pos_id, effective_stop, exit_reason=reason)
+                    continue
             else:
-                conn2 = sqlite3.connect(self.db_path)
-                cur2 = conn2.cursor()
-                cur2.execute("""
-                UPDATE portfolio_positions SET
-                    current_price = ?,
-                    trailing_stop = ?,
-                    unrealized_gross_pnl = ?,
-                    estimated_charges = ?,
-                    unrealized_net_pnl = ?
-                WHERE id = ?
-                """, (curr_px, new_trailing, unreal_gross, charges["total_charges"], unreal_net, pos_id))
-                conn2.commit()
-                conn2.close()
+                if curr_px > entry_px + 1.2 * atr:
+                    new_trailing = max(trailing_sl, curr_px - 1.2 * atr)
+                effective_stop = max(sl, new_trailing)
+                if curr_px >= tp:
+                    self.close_position(pos_id, tp, exit_reason="TARGET_HIT (+2.5R)")
+                    continue
+                elif curr_px <= effective_stop:
+                    reason = "TRAILING_STOP" if effective_stop > sl else "STOP_LOSS (-1R)"
+                    self.close_position(pos_id, effective_stop, exit_reason=reason)
+                    continue
+
+            conn2 = sqlite3.connect(self.db_path)
+            cur2 = conn2.cursor()
+            cur2.execute("""
+            UPDATE portfolio_positions SET
+                current_price = ?,
+                trailing_stop = ?,
+                unrealized_gross_pnl = ?,
+                estimated_charges = ?,
+                unrealized_net_pnl = ?
+            WHERE id = ?
+            """, (curr_px, new_trailing, unreal_gross, charges["total_charges"], unreal_net, pos_id))
+            conn2.commit()
+            conn2.close()
 
 portfolio_5k = Portfolio5KManager()
 

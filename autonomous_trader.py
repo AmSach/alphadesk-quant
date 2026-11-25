@@ -948,9 +948,12 @@ class AutonomousRLEngine:
                             VALUES (?, ?, 'BUY', ?, ?, ?, ?, 'OPEN', ?, 0.0, 0.0)
                             """, (now_str, sym, curr_px, timing["stop_loss"], timing["target_price"], shares, curr_px))
 
-                        # 5K Portfolio execution hook (with 5-minute ticker cooldown to prevent rapid looping)
+                        # 5K Portfolio execution hook (guarded strictly to active NSE cash market hours Mon-Fri 09:30-15:05 IST)
+                        from datetime import datetime as _dt, timedelta as _td
+                        ist_now = _dt.utcnow() + _td(hours=5, minutes=30)
+                        in_nse_hours = (ist_now.weekday() < 5) and ((9, 30) <= (ist_now.hour, ist_now.minute) <= (15, 5))
                         now_t = time.time()
-                        if now_t - cooldowns.get(sym, 0) >= 300:
+                        if in_nse_hours and (now_t - cooldowns.get(sym, 0) >= 300):
                             try:
                                 if sym in ["SUZLON.NS", "TATASTEEL.NS", "IOC.NS", "PNB.NS", "IREDA.NS", "CDSL.NS"]:
                                     res = portfolio_5k.execute_trade(
@@ -966,9 +969,12 @@ class AutonomousRLEngine:
                             except Exception:
                                 pass
 
-                # Update 5K INR Portfolio MTM prices and exit triggers
+                # Update 5K INR Portfolio MTM prices only during active NSE hours (09:15-15:30 IST)
                 try:
-                    portfolio_5k.update_market_prices()
+                    from datetime import datetime as _dt2, timedelta as _td2
+                    ist_mtm = _dt2.utcnow() + _td2(hours=5, minutes=30)
+                    if (ist_mtm.weekday() < 5) and ((9, 15) <= (ist_mtm.hour, ist_mtm.minute) <= (15, 30)):
+                        portfolio_5k.update_market_prices()
                 except Exception:
                     pass
 

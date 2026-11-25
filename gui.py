@@ -498,9 +498,19 @@ class AlphaDeskGUI(QMainWindow):
         
         # Init Pool
         self._init_pool()
-        
-        # Start 24/7 Autonomous Surveillance & RL Engine
-        trader_engine.start_247_daemon()
+
+        # Start 24/7 Autonomous Surveillance & RL Engine only if backend server is not already live
+        server_alive = False
+        try:
+            import urllib.request
+            with urllib.request.urlopen("http://127.0.0.1:8000/api/neural_telemetry", timeout=0.6) as resp:
+                if resp.status == 200:
+                    server_alive = True
+        except Exception:
+            server_alive = False
+
+        if not server_alive:
+            trader_engine.start_247_daemon()
 
         # Setup UI
         self._setup_ui()

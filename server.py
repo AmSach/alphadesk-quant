@@ -738,7 +738,8 @@ class AlphaDeskHandler(SimpleHTTPRequestHandler):
                 qty = int(params.get("qty", [50])[0])
                 order_type = params.get("order_type", ["INTRADAY"])[0]
                 exchange = params.get("exchange", ["NSE"])[0]
-                res = IndianBrokerFeeModel.calculate_charges(entry, exit_px, qty, order_type, exchange)
+                side = params.get("side", ["BUY"])[0]
+                res = IndianBrokerFeeModel.calculate_charges(entry, exit_px, qty, order_type, exchange, side=side)
                 status = 200
             except Exception as e:
                 res = {"error": str(e)}
